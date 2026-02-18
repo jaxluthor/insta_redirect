@@ -122,7 +122,22 @@ function showResults() {
         resultTitle.innerText = "Keep trying!";
         resultDesc.innerText = `You got ${score}/${questions.length} correct. You need more than 50% score to unlock the reward.`;
         retryBtn.classList.remove('hidden');
+
+        // Add a "Finish" button for failed attempts too
+        const finishBtn = document.createElement('button');
+        finishBtn.className = 'action-btn';
+        finishBtn.style.marginTop = '10px';
+        finishBtn.style.background = 'transparent';
+        finishBtn.style.border = '1px solid #dbdbdb';
+        finishBtn.innerText = 'Go to Instagram';
+        finishBtn.onclick = () => window.location.href = 'https://www.instagram.com';
+        resultContainer.appendChild(finishBtn);
     }
+
+    // Auto-redirect after 15 seconds to Instagram (gives time to see results/reward)
+    setTimeout(() => {
+        window.location.href = 'https://www.instagram.com';
+    }, 15000);
 }
 
 initQuiz();
