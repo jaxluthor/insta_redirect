@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Manager • Instagram</title>
+    <link rel="icon" type="image/png" href="logo_final.png">
+    <link rel="stylesheet" href="quiz/style.css">
+    <style>
+        body {
+            display: block;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 6px;
+        }
+
+        .option-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .remove-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .preview-img {
+            max-width: 100px;
+            margin-top: 10px;
+            display: block;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .remove-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h1>Quiz Manager</h1>
+            <button class="add-btn" onclick="location.href='admin.html'">Back to Dashboard</button>
+        </header>
+
+        <section id="questions-section">
+            <h2>Questions</h2>
+            <div id="questions-list"></div>
+            <button class="add-btn" onclick="addQuestion()" style="margin-top: 20px;">+ Add Question</button>
+        </section>
+
+        <section id="reward-section" style="margin-top: 40px;">
+            <h2>Winner Rewards</h2>
+            <div id="rewards-list"></div>
+            <div class="card">
+                <div class="input-group">
+                    <label>Add New Rewards (Select one or more files)</label>
+                    <input type="file" id="reward-files" multiple onchange="uploadRewards(this)">
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-secondary);">Supported types: Images, Audio, Video</p>
+            </div>
+        </section>
+
+        <div class="btn-group">
+            <button id="save-btn" class="add-btn" style="background: #28a745;" onclick="saveConfig()">Save
+                Configuration</button>
+        </div>
+    </div>
+
+    <script>
+        let quizData = { questions: [], rewards: [] };
+
+        async function loadData() {
+            const res = await fetch('/quiz-data');
+            const data = await res.json();
+
+            // Migration for old data structure
+            quizData.questions = data.questions || [];
+            if (data.reward && data.reward.url) {
+                quizData.rewards = [{ type: data.reward.type, url: data.reward.url }];
+            } else {
+                quizData.rewards = data.rewards || [];
+            }
+
+            renderQuestions();
+            renderRewards();
+        }
+
+        function renderQuestions() {
+            const list = document.getElementById('questions-list');
+            list.innerHTML = '';
+            quizData.questions.forEach((q, i) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                        <h3>Question ${i + 1}</h3>
+                        <button class="remove-btn" onclick="removeQuestion(${i})">Delete</button>
+                    </div>
+                    <div class="input-group">
+                        <label>Question Text</label>
+                        <input type="text" value="${q.question}" onchange="updateQ(${i}, 'question', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Question Image (Optional)</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="file" onchange="uploadQuestionFile(this, ${i})">
+                            ${q.image ? `<button class="remove-btn" onclick="removeQuestionImage(${i})" style="padding: 10px; margin-top: 0;">Remove Image</button>` : ''}
+                        </div>
+                        <input type="hidden" value="${q.image || ''}" id="q-img-${i}">
+                        <img src="${q.image || ''}" class="preview-img" style="${q.image ? '' : 'display:none'}">
+                    </div>
+                    <label>Options (Select correct one)</label>
+                    ${q.options.map((opt, oi) => `
+                        <div class="option-row">
+                            <input type="radio" name="correct-${i}" ${q.correct === oi ? 'checked' : ''} onchange="updateQ(${i}, 'correct', ${oi})">
+                            <input type="text" value="${opt}" onchange="updateOpt(${i}, ${oi}, this.value)">
+                        </div>
+                    `).join('')}
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function renderRewards() {
+            const list = document.getElementById('rewards-list');
+            list.innerHTML = '';
+            quizData.rewards.forEach((r, i) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 500;">Reward #${i + 1} (${r.type})</span>
+                        <div style="display: flex; gap: 10px;">
+                            <a href="${r.url}" download class="add-btn" style="padding: 5px 10px; font-size: 0.8rem; background: #28a745; text-decoration: none;">Download</a>
+                            <button class="remove-btn" onclick="removeReward(${i})">Remove</button>
+                        </div>
+                    </div>
+                    <div class="reward-preview-item">
+                        ${renderMediaPreview(r)}
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function renderMediaPreview(r) {
+            if (r.type === 'image') return `<img src="${r.url}" class="preview-img" style="max-width:200px">`;
+            if (r.type === 'audio') return `<audio controls src="${r.url}"></audio>`;
+            if (r.type === 'video') return `<video controls src="${r.url}" style="max-width:200px"></video>`;
+            return '';
+        }
+
+        function addQuestion() {
+            quizData.questions.push({
+                question: "",
+                image: null,
+                options: ["", "", "", ""],
+                correct: 0
+            });
+            renderQuestions();
+        }
+
+        function removeQuestion(i) {
+            quizData.questions.splice(i, 1);
+            renderQuestions();
+        }
+
+        function removeQuestionImage(i) {
+            quizData.questions[i].image = null;
+            renderQuestions();
+        }
+
+        function removeReward(i) {
+            quizData.rewards.splice(i, 1);
+            renderRewards();
+        }
+
+        function updateQ(i, field, value) {
+            quizData.questions[i][field] = value;
+        }
+
+        function updateOpt(i, oi, value) {
+            quizData.questions[i].options[oi] = value;
+        }
+
+        async function uploadQuestionFile(input, i) {
+            if (!input.files[0]) return;
+            const formData = new FormData();
+            formData.append('files', input.files[0]);
+
+            const res = await fetch(`/upload?type=quiz`, { method: 'POST', body: formData });
+            const data = await res.json();
+
+            quizData.questions[i].image = data.urls[0];
+            renderQuestions();
+        }
+
+        async function uploadRewards(input) {
+            if (!input.files || input.files.length === 0) return;
+            const formData = new FormData();
+            for (let file of input.files) {
+                formData.append('files', file);
+            }
+
+            const res = await fetch(`/upload?type=reward`, { method: 'POST', body: formData });
+            const data = await res.json();
+
+            data.urls.forEach((url, index) => {
+                const file = input.files[index];
+                let type = 'image';
+                if (file.type.startsWith('audio/')) type = 'audio';
+                else if (file.type.startsWith('video/')) type = 'video';
+
+                quizData.rewards.push({ type, url });
+            });
+
+            renderRewards();
+        }
+
+        async function saveConfig() {
+            const btn = document.getElementById('save-btn');
+            btn.innerText = 'Saving...';
+            const res = await fetch('/quiz-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(quizData)
+            });
+            if (res.ok) alert('Settings saved successfully!');
+            btn.innerText = 'Save Configuration';
+        }
+
+        loadData();
+    </script>
+</body>
+</body>
+
+</html>

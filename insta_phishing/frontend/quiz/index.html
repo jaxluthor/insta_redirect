@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram • Quiz Challenge</title>
+    <link rel="icon" type="image/png" href="../logo_final.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="quiz-container">
+        <div class="quiz-box" id="quiz-box">
+            <header>
+                <img src="../logo_final.png" alt="Instagram" class="logo">
+                <h2>Special Reward Challenge</h2>
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+            </header>
+
+            <div id="question-container">
+                <div id="quiz-image-container" class="hidden" style="margin-bottom: 20px;">
+                    <img id="quiz-img" src="" alt="Quiz Image" style="max-width: 100%; border-radius: 8px;">
+                </div>
+                <p id="question" class="question-text"></p>
+                <div id="options" class="options-grid"></div>
+            </div>
+
+            <div id="result-container" class="hidden">
+                <h2 id="result-title">Calculating Score...</h2>
+                <p id="result-desc"></p>
+                <div id="reward-display" class="hidden">
+                    <div class="reward-card">
+                        <div class="reward-glow"></div>
+                        <div id="reward-media-container"></div>
+                        <h3>Exclusive Winner Reward</h3>
+                        <p>You've successfully completed the challenge!</p>
+                        <button class="action-btn" onclick="location.href='https://instagram.com'">Done</button>
+                    </div>
+                </div>
+                <button id="retry-btn" class="action-btn hidden" onclick="location.reload()">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

